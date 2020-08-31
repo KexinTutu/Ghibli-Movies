@@ -2,11 +2,20 @@ Ghibli Movie List
 =================
 Show plain list of all movies of Studio Ghibli.
 
+Dependencies
+-------
+First, make sure docker and docker-compose are available on your local machine.
+
+Docker >= 17.05
+
+Docker-Compose >= 1.13
+
 Installation
 ------------
 Quick setup, run from the `GhibliMovies` directory:
 
 ```sh
+docker-compose build
 docker-compose up -d
 ```
 localhost:8000/movies
