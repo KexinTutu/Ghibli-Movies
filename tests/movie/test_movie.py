@@ -61,8 +61,6 @@ class MovieTests(TestCase):
         self.people = people_json
         self.movies = movie_json
 
-    
-
     def test_get_movie_list(self):
         def get_api(*args):
             if args[0] == 'people':
@@ -70,21 +68,25 @@ class MovieTests(TestCase):
             elif args[0] == 'films':
                 return self.movies
         with mock.patch.object(MovieListAPIView, 'get_ghibli_api', side_effect=get_api):
-            response = self.client.get('/movies')
+            view = MovieListAPIView.as_view()
+            req = RequestFactory()
+            request = req.get('/movies')
+            response = view(request)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response['content-type'], 'application/json')
             self.assertEqual(
-                response.json()[0]['new_people'],
+                response.data[0]['new_people'],
                 list(filter(lambda person: person['name'] == 'Chibi Totoro', self.people))
             )
 
     @mock.patch.object(MovieListAPIView, 'get_ghibli_api')
     def test_get_movie_list_exception(self, mock_ghibli_api):
         mock_ghibli_api.side_effect = Exception('test exception')
-        response = self.client.get('/movies')
+        view = MovieListAPIView.as_view()
+        req = RequestFactory()
+        request = req.get('/movies')
+        response = view(request)
         self.assertEqual(response.status_code, 500)
-        self.assertEqual(response['content-type'], 'application/json')
-        self.assertEqual(response.json(), {"detail": "test exception"})
+        self.assertEqual(response.data, {"detail": "test exception"})
 
     @mock.patch('ghibli_movies.apps.movie.views.requests.get')
     def test_get_ghibli_api_200(self, mock_get):
